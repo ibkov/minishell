@@ -2,21 +2,22 @@ NAME = minishell
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -Werror -I includes/ -I libft/includes/
+CFLAGS = -Wall -Wextra -Werror -I includes/ -I libft/
 
-LIBFT = -L libft -lft
+LIBFT = -L. -lft 
 
-SRC = src/*
+SRC = src/minishell.c
 
-OBJ = $(SRC:c=o)
+OBJ = $(SRC:.c=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
+$(NAME): $(OBJ) libft
 	@echo "\n"
-	@make -C libft/
 	@echo "\033[0;32mCompiling minishell..."
-	@$(CC) $(CFLAGS) -o $(NAME) $(OBJ)
+	@make -C libft/
+	cp libft/libft.a .
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT)
 	@echo "\n\033[0mDone !"
 
 %.o: %.c
@@ -42,7 +43,7 @@ fclean:
 re: fclean all
 
 test: all
-	./minishell
+	./$(NAME)
 
 norm:
 	norminette $(SRC) includes/$(HEADER)
