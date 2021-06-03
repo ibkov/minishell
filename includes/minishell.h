@@ -2,6 +2,7 @@
 # define MINISHELL_H
 
 # include "libft.h"
+# include "get_next_line.h"
 # include <stdlib.h>
 # include <unistd.h>
 # include <stdio.h>
@@ -13,4 +14,8 @@
 # include <errno.h>
 # include <signal.h>
 
+typedef struct s_main
+{
+
+}                   t_main;
 #endif
