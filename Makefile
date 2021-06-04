@@ -6,11 +6,34 @@ CFLAGS = -Wall -Wextra -Werror -I includes/ -I libft/
 
 LIBFT = -L. -lft 
 
-SRC = src/minishell.c \
-		gnl/get_next_line.c \
-		gnl/get_next_line_utils.c \
+PARSER_DIR = parser/
 
-OBJ = $(SRC:.c=.o)
+PARSER_LIST = parse.c \
+
+UTILS_DIR = parser/utils/
+
+UTILS_LIST = string_utils.c \
+
+GNL_DIR = gnl/
+
+GNL_LIST = get_next_line.c \
+		get_next_line_utils.c \
+
+SRC_DIR = src/
+
+SRC_LIST = minishell.c \
+
+SRC = $(addprefix $(SRC_DIR), $(SRC_LIST))
+
+GNL = $(addprefix $(GNL_DIR), $(GNL_LIST))
+
+PARSER = $(addprefix $(PARSER_DIR), $(PARSER_LIST))
+
+UTILS = $(addprefix $(UTILS_DIR), $(UTILS_LIST))
+
+SRCS = $(SRC) $(GNL) $(UTILS) $(PARSER)
+
+OBJ = $(SRCS:.c=.o)
 
 all: $(NAME)
 

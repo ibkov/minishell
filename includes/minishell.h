@@ -16,6 +16,10 @@
 
 typedef struct s_main
 {
-
+    char    *base_command;
+    char    *mod_command;
 }                   t_main;
+
+void     parse(__unused t_main *main, char *command);
+char    *del_spaces(char *str);
 #endif

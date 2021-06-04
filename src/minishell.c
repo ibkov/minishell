@@ -1,21 +1,22 @@
 #include <stdio.h>
 #include <minishell.h>
 
-int executor(__unused t_main *main, char *command, char **envp)
+int executor(__unused t_main *main, char **envp)
 {
     pid_t   pid;
     
-    char *args[] = {command, NULL};
-    char *path = ft_strjoin("/bin/", command);
+    char *args[] = {main->base_command, main->mod_command,NULL};
+    printf("base = %s\n mod = %s\n", main->base_command, main->mod_command);
+    char *path = ft_strjoin("/bin/", main->base_command);
 
-    if(ft_strncmp(command, "exit", 64))
+    if(ft_strncmp(main->base_command, "exit", 64))
     {
         pid = fork();
         if(pid == 0)
         {
             execve(path, args, envp);
-            perror("execve");   
-            printf("Invalid command..\n");
+            perror("zsh");   
+            printf("zsh: command not found: %s\n", main->base_command);
             exit(0);
         }
         else if (pid > 0)
@@ -42,8 +43,8 @@ int main(__unused int argc, __unused char **argv, __unused char **envp)
         {
             ft_putstr_fd("sh>", 1);
             get_next_line(1, &command);
-            // parser(line, &main);
-            if(executor(&main, command, envp))
+            parse(&main, command);
+            if(executor(&main, envp))
             {
                 free(command);
                 break;
