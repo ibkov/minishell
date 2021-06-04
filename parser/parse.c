@@ -2,16 +2,22 @@
 
 void    parse(__unused t_main *main, __unused char *command)
 {
-    char **commands;
-    int i = 0;
+    static char *commands[5];
+    int argc;
 
-    command = del_spaces(command);
-    commands = ft_split(command, ' '); // malloc
-    while (commands[i] != NULL)
+    argc = 0;
+    main->base_command = ft_strdup(command); //malloc
+    while (*command != '\0')
     {
-        commands[i] = del_spaces(commands[i]);
-        i++;
+        if (*command != ' ')
+        {
+            commands[argc++] = command;
+            while (*command != '\0' && *command != ' ')
+                command++;
+            *command = '\0';
+        }
+        command++;
     }
-    main->base_command = commands[0];
-    main->mod_command = commands[1];
+    commands[argc] = NULL;
+    main->command = commands;
 }
