@@ -2,21 +2,47 @@ NAME = minishell
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -Werror -I includes/ -I libft/includes/
+CFLAGS = -Wall -Wextra -Werror -I includes/ -I libft/
 
-LIBFT = -L libft -lft
+LIBFT = -L. -lft 
 
-SRC = src/*
+PARSER_DIR = parser/
 
-OBJ = $(SRC:c=o)
+PARSER_LIST = parse.c \
+
+UTILS_DIR = parser/utils/
+
+UTILS_LIST = string_utils.c \
+
+GNL_DIR = gnl/
+
+GNL_LIST = get_next_line.c \
+		get_next_line_utils.c \
+
+SRC_DIR = src/
+
+SRC_LIST = minishell.c \
+
+SRC = $(addprefix $(SRC_DIR), $(SRC_LIST))
+
+GNL = $(addprefix $(GNL_DIR), $(GNL_LIST))
+
+PARSER = $(addprefix $(PARSER_DIR), $(PARSER_LIST))
+
+UTILS = $(addprefix $(UTILS_DIR), $(UTILS_LIST))
+
+SRCS = $(SRC) $(GNL) $(UTILS) $(PARSER)
+
+OBJ = $(SRCS:.c=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
+$(NAME): $(OBJ) libft
 	@echo "\n"
-	@make -C libft/
 	@echo "\033[0;32mCompiling minishell..."
-	@$(CC) $(CFLAGS) -o $(NAME) $(OBJ)
+	@make -C libft/
+	cp libft/libft.a .
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT)
 	@echo "\n\033[0mDone !"
 
 %.o: %.c
@@ -42,7 +68,7 @@ fclean:
 re: fclean all
 
 test: all
-	./minishell
+	./$(NAME)
 
 norm:
 	norminette $(SRC) includes/$(HEADER)
