@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <minishell.h>
+#include "minishell.h"
 
 void	redirect(t_main *main)
 {
@@ -43,16 +43,38 @@ void	redirect(t_main *main)
 int executor(__unused t_main *main, char **envp)
 {
 	pid_t	pid;
-	char	*path;
+	char *dir = NULL;
+	int i = 0;
 	
-	path = ft_strjoin("/bin/", main->command[0]); //malloc √
-	if(ft_strncmp(main->command[0], "exit", 64))
+	main->unix_path = ft_strjoin("/bin/", main->command[0]); //malloc √
+	if (ft_strncmp(&main->base_command[0],"env", 3) == 0)
+	{
+		while (envp[i] != NULL)
+		{
+			printf("%s\n", envp[i++]);
+		}
+	}
+	else if (ft_strncmp(&main->base_command[0],"cd", 2) == 0)
+	{
+		dir = getcwd(dir, 100);
+		if (ft_strncmp(main->command[1],"..", 2) == 0)
+		{
+			change_envp(envp, "OLDPWD=", dir);
+			i = ft_strlen(dir);
+			while(dir[i] != '/')
+				i--;
+			dir[i] = '\0';
+		}
+		chdir(dir);
+		change_envp(envp, "PWD=", dir);
+	}
+	else if(ft_strncmp(main->command[0], "exit", 64))
 	{
 		pid = fork();
 		if(pid == 0)
 		{
 			redirect(main);
-			execve(path, main->command, envp);
+			execve(main->unix_path, main->command, envp);
 			perror("zsh");   
 			printf("zsh: command not found: %s\n", main->command[0]);
 			exit(0);
@@ -64,7 +86,7 @@ int executor(__unused t_main *main, char **envp)
 	}
 	else
 	{
-		free(path);
+		free(main->unix_path);
 		return (1);
 	}
 	return (0);
@@ -74,7 +96,9 @@ int main(__unused int argc, __unused char **argv, __unused char **envp)
 {
 	char *command;
 	t_main main;
+	int i = 0;
 
+	main.envp = envp;
 	if(argc == 1)
 	{
 		while(1)
@@ -82,13 +106,21 @@ int main(__unused int argc, __unused char **argv, __unused char **envp)
 			ft_putstr_fd("sh>", 1);
 			get_next_line(1, &command);
 			parse(&main, command);
-			if(executor(&main, envp))
+			if(executor(&main, main.envp))
 			{
 				free(command);
 				break;
 			}
 			free(command);
 		}
+	}
+	else
+	{
+		while (envp[i] != NULL)
+		{
+			printf("%s\n", envp[i++]);
+		}
+		
 	}
 	exit (0);
 }

@@ -22,6 +22,8 @@ GNL_LIST = get_next_line.c \
 SRC_DIR = src/
 
 SRC_LIST = minishell.c \
+			src_utils.c \
+			envp.c
 
 SRC = $(addprefix $(SRC_DIR), $(SRC_LIST))
 
