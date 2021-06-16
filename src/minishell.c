@@ -47,7 +47,11 @@ int executor(__unused t_main *main, char **envp)
 	int i = 0;
 	
 	main->unix_path = ft_strjoin("/bin/", main->command[0]); //malloc √
-	if (ft_strncmp(&main->base_command[0],"env", 3) == 0)
+	if (ft_strncmp(&main->base_command[0],"export", 6) == 0)
+	{
+		export(main,"TEST=", "test");
+	}
+	else if (ft_strncmp(&main->base_command[0],"env", 3) == 0)
 	{
 		while (envp[i] != NULL)
 		{
@@ -96,11 +100,12 @@ int main(__unused int argc, __unused char **argv, __unused char **envp)
 {
 	char *command;
 	t_main main;
-	int i = 0;
+	int i;
 
-	main.envp = envp;
+	i = 0;
 	if(argc == 1)
 	{
+		init_envp(&main, envp);
 		while(1)
 		{
 			ft_putstr_fd("sh>", 1);

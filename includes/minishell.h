@@ -26,4 +26,7 @@ char    *del_spaces(char *str);
 char    *create_path(char **components, int len);
 int     count_len(char **argv);
 void    change_envp(char **envp, char *variable, char *value);
+void    init_envp(t_main *main, char **envp);
+void    export(t_main *main, char *variable, char *value);
+void    free_envp(t_main *main);
 #endif
