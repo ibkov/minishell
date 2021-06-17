@@ -1,52 +1,12 @@
 #include <stdio.h>
 #include "minishell.h"
 
-void	redirect(t_main *main)
-{
-	int redirect_flag = 0;
-	char *redirect_file = NULL;
-	int i = 0;
-	int id;
-
-	while(main->command[i])
-	{
-		if (ft_strncmp(main->command[i], ">", 1) == 0)
-		{
-			if (ft_strncmp(main->command[i], ">>", 2) == 0)
-			{
-				redirect_flag++;
-			}
-			redirect_flag++;
-			id = i;
-			main->command[i] = NULL;
-		}
-		i++;
-	}
-	if (redirect_flag > 0)
-		redirect_file = main->command[id + 1];
-
-	if(redirect_flag == 1)
-	{
-		int fd = open(redirect_file, O_WRONLY|O_CREAT|O_TRUNC, 0664);
-		dup2(fd, 1);
-		// Перенаправляем стандартный вывод в файл
-		// это перенаправление перезаписи, открыто в режиме перезаписи O_TRUNC
-	}
-	else if(redirect_flag == 2)
-	{
-		int fd = open(redirect_file, O_WRONLY|O_CREAT|O_APPEND, 0664);
-		dup2(fd, 1);
-		//это дополнительное перенаправление, открытое в режиме добавления O_APPEND
-	}
-}
-
 int executor(__unused t_main *main, char **envp)
 {
 	pid_t	pid;
-	char *dir = NULL;
 	int i = 0;
 	
-	main->unix_path = ft_strjoin("/bin/", main->command[0]); //malloc √
+	main->unix_path = ft_strjoin("/bin/", main->command[0]);
 	if (ft_strncmp(&main->base_command[0],"export", 6) == 0)
 	{
 		export(main,"TEST=", "test");
@@ -60,17 +20,7 @@ int executor(__unused t_main *main, char **envp)
 	}
 	else if (ft_strncmp(&main->base_command[0],"cd", 2) == 0)
 	{
-		dir = getcwd(dir, 100);
-		if (ft_strncmp(main->command[1],"..", 2) == 0)
-		{
-			change_envp(envp, "OLDPWD=", dir);
-			i = ft_strlen(dir);
-			while(dir[i] != '/')
-				i--;
-			dir[i] = '\0';
-		}
-		chdir(dir);
-		change_envp(envp, "PWD=", dir);
+		cd(main);
 	}
 	else if(ft_strncmp(main->command[0], "exit", 64))
 	{
@@ -90,7 +40,6 @@ int executor(__unused t_main *main, char **envp)
 	}
 	else
 	{
-		free(main->unix_path);
 		return (1);
 	}
 	return (0);
@@ -118,14 +67,6 @@ int main(__unused int argc, __unused char **argv, __unused char **envp)
 			}
 			free(command);
 		}
-	}
-	else
-	{
-		while (envp[i] != NULL)
-		{
-			printf("%s\n", envp[i++]);
-		}
-		
 	}
 	exit (0);
 }

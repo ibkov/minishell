@@ -22,8 +22,13 @@ GNL_LIST = get_next_line.c \
 SRC_DIR = src/
 
 SRC_LIST = minishell.c \
+			redirect.c \
 			src_utils.c \
-			envp.c
+			envp/envp.c \
+			envp/export.c \
+			envp/unset.c \
+			envp/cd.c \
+			
 
 SRC = $(addprefix $(SRC_DIR), $(SRC_LIST))
 
