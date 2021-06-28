@@ -11,11 +11,11 @@ int executor(__unused t_main *main, char **envp)
 	main->unix_path = ft_strjoin("/bin/", main->command[0]); //malloc √
 	if (ft_strncmp(&main->base_command[0],"export", 6) == 0)
 	{
-		export(main,"TEST=", "test");
+		export(main, "TEST=", "test");
 	}
-	else if (ft_strncmp(&main->base_command[0],"unset", 5) == 0)
+	else if (ft_strncmp(&main->base_command[0], "unset", 5) == 0)
 	{
-		export(main,"TEST=", "test");
+		sh_unset(main);
 	}
 	else if (ft_strncmp(&main->base_command[0],"env", 3) == 0)
 	{

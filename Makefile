@@ -26,6 +26,7 @@ SRC_LIST = minishell.c \
 			envp.c \
 			signals.c \
 			redirect.c \
+			built-in/unset.c
 
 SRC = $(addprefix $(SRC_DIR), $(SRC_LIST))
 

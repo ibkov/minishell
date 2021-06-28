@@ -58,4 +58,6 @@ void	redirect(t_main *main);
 void	sig_int(int code);
 void	sig_quit(int code);
 void	sig_init(void);
+void 	sh_unset(t_main *main);
+
 #endif
