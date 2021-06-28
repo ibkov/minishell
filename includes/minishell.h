@@ -44,20 +44,22 @@ typedef struct s_main
     char    **command;
     char    *unix_path;
     char    **envp;
+	char 	*cmd;
     int     exit;
     int     quit;
 }                   t_main;
-void    parse(__unused t_main *main, char *command);
+void    parse(__unused t_main *main);
 char    *del_spaces(char *str);
 char    *create_path(char **components, int len);
 int     count_len(char **argv);
 void    change_envp(char **envp, char *variable, char *value);
 void    init_envp(t_main *main, char **envp);
 void    export(t_main *main, char *variable, char *value);
-void    free_envp(t_main *main);
+void    free_argv(char **argv);
 void	redirect(t_main *main);
 
 void    cd(t_main *main);
+void 	echo(t_main *main);
 
 void	sig_int(int code);
 void	sig_quit(int code);

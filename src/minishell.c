@@ -47,18 +47,17 @@ int executor(__unused t_main *main, char **envp)
 		free(main->unix_path);
 		return (1);
 	}
+	free(main->unix_path);
 	return (0);
 }
 
 int main(int argc, __unused char **argv, char **envp)
 {
-	char *command;
 	t_main main;
 	int i;
 
 	i = 0;
 	main.exit = 0;
-	command = NULL;
 	if(argc == 1)
 	{
 		init_envp(&main, envp);
@@ -66,13 +65,13 @@ int main(int argc, __unused char **argv, char **envp)
 		sig_init();
 		while(main.exit == 0)
 		{
-			parse(&main, command);
+			parse(&main);
 			if(executor(&main, main.envp))
 			{
-				free(command);
 				break;
 			}
-			free(command);
+			free(main.base_command);
+			free_argv(main.command);
 		}
 	}
 	exit (0);

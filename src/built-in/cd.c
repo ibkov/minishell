@@ -9,7 +9,7 @@ static char *cd_down(char *dir, char **envp)
 	while(dir[i] != '/')
 		i--;
 	dir[i] = '\0';
-    return (dir);
+    return (ft_strdup(dir));
 }
 
 static char *cd_rel(char *dir, char **envp, char *val)
@@ -19,35 +19,33 @@ static char *cd_rel(char *dir, char **envp, char *val)
     change_envp(envp, "OLDPWD=", dir);
     tmp = val;
     val = ft_strjoin("/", val);
-    free(tmp);
-    tmp = NULL;
     tmp = dir;
     dir = ft_strjoin(dir, val);
-    free(tmp);
     free(val);
     return (dir);
 }
 
 void    cd(t_main *main)
 {   
-    char *dir;
+    char *current_dir;
+    char *new_dir;
 
-    dir = NULL;
-    dir = getcwd(dir, 100);
+    current_dir = getcwd(NULL, 100);
 	if (ft_strncmp(main->command[1],"..", 2) == 0)
 	{
-        dir = cd_down(dir, main->envp);
+        new_dir = cd_down(current_dir, main->envp);
 	}
-    else if(ft_strncmp(main->command[1], dir, ft_strlen(dir)) == 0)
+    else if(ft_strncmp(main->command[1], current_dir, ft_strlen(current_dir)) == 0)
     {
-        change_envp(main->envp, "OLDPWD=", dir);
-        dir = ft_strdup(main->command[1]);
+        change_envp(main->envp, "OLDPWD=", current_dir);
+        new_dir = ft_strdup(main->command[1]);
     }
     else 
     {
-        dir = cd_rel(dir, main->envp, main->command[1]);
+        new_dir = cd_rel(current_dir, main->envp, main->command[1]);
     }
-	chdir(dir);
-	change_envp(main->envp, "PWD=", dir);
-    free(dir);
+	chdir(new_dir);
+	change_envp(main->envp, "PWD=", new_dir);
+    free(new_dir);
+    free(current_dir);
 }
