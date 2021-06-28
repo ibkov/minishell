@@ -30,3 +30,15 @@ drwxr-xr-x  86 dmyesha  student   2924 Jun 28 13:26 libft
 drwxr-xr-x   5 dmyesha  student    170 Jun 28 14:06 parser
 drwxr-xr-x  10 dmyesha  student    340 Jun 28 14:49 src
 -rw-r--r--   1 dmyesha  student    898 Jun 28 14:55 text.txt
+Makefile
+README.md
+description
+gnl
+includes
+libft
+libft.a
+minishell
+parser
+src
+text.txt
+text111.txt
