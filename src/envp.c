@@ -1,22 +1,21 @@
 #include "minishell.h"
 
-void free_envp(t_main *main)
+void free_argv(char **argv)
 {
     int i;
     int j;
 
     i = 0;
     j = 0;
-    while (main->envp[i] != NULL)
+    while (argv[i] != NULL)
         i++;
-    while(j < i)
+    i--;
+    while(j <= i)
     {
-        free(main->envp[j]);
-        main->envp[j] = NULL;
-        j++;
+        free(argv[i]);
+        argv[i] = NULL;
+        i--;
     }
-    free(main->envp);
-    main->envp = NULL;
 }
 
 void init_envp(t_main *main, char **envp)
@@ -58,7 +57,7 @@ void export(t_main *main, char *variable, char *value)
         i++;
     }
     envp[i] = ft_strjoin(variable, value);
-    free_envp(main);
+    free_argv(main->envp);
     main->envp = envp;
 }
 
