@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "minishell.h"
 
+t_sig	g_sig;
+
 void	redirect(t_main *main)
 {
 	int redirect_flag = 0;
@@ -42,12 +44,15 @@ void	redirect(t_main *main)
 
 int executor(__unused t_main *main, char **envp)
 {
-	pid_t	pid;
 	char *dir = NULL;
 	int i = 0;
 	
 	main->unix_path = ft_strjoin("/bin/", main->command[0]); //malloc √
 	if (ft_strncmp(&main->base_command[0],"export", 6) == 0)
+	{
+		export(main,"TEST=", "test");
+	}
+	else if (ft_strncmp(&main->base_command[0],"unset", 5) == 0)
 	{
 		export(main,"TEST=", "test");
 	}
@@ -74,17 +79,16 @@ int executor(__unused t_main *main, char **envp)
 	}
 	else if(ft_strncmp(main->command[0], "exit", 64))
 	{
-		pid = fork();
-		if(pid == 0)
+		g_sig.pid = fork();
+		if(g_sig.pid == 0)
 		{
 			redirect(main);
 			execve(main->unix_path, main->command, envp);
-			perror("zsh");   
 			printf("zsh: command not found: %s\n", main->command[0]);
 			exit(0);
 		}
-		else if (pid > 0)
-			waitpid(pid, 0, 0);
+		else if (g_sig.pid > 0)
+			waitpid(g_sig.pid, 0, 0);
 		else
 			perror("Error fork\n");
 	}
@@ -96,20 +100,23 @@ int executor(__unused t_main *main, char **envp)
 	return (0);
 }
 
-int main(__unused int argc, __unused char **argv, __unused char **envp)
+int main(int argc, __unused char **argv, char **envp)
 {
 	char *command;
 	t_main main;
 	int i;
 
 	i = 0;
+	main.exit = 0;
+	command = NULL;
 	if(argc == 1)
 	{
 		init_envp(&main, envp);
-		while(1)
+		change_envp(main.envp, "SHLVL=", "2");
+		sig_init();
+		while(main.exit == 0)
 		{
-			ft_putstr_fd("sh>", 1);
-			get_next_line(1, &command);
+			ft_putstr_fd("\033[0;36m\033[1m minishell ▸ \033[0m", STDERR);
 			parse(&main, command);
 			if(executor(&main, main.envp))
 			{
@@ -118,14 +125,6 @@ int main(__unused int argc, __unused char **argv, __unused char **envp)
 			}
 			free(command);
 		}
-	}
-	else
-	{
-		while (envp[i] != NULL)
-		{
-			printf("%s\n", envp[i++]);
-		}
-		
 	}
 	exit (0);
 }
