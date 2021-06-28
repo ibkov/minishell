@@ -5,7 +5,6 @@ t_sig	g_sig;
 
 int executor(__unused t_main *main, char **envp)
 {
-	char *dir = NULL;
 	int i = 0;
 	
 	main->unix_path = ft_strjoin("/bin/", main->command[0]); //malloc √
@@ -26,17 +25,7 @@ int executor(__unused t_main *main, char **envp)
 	}
 	else if (ft_strncmp(&main->base_command[0],"cd", 2) == 0)
 	{
-		dir = getcwd(dir, 100);
-		if (ft_strncmp(main->command[1],"..", 2) == 0)
-		{
-			change_envp(envp, "OLDPWD=", dir);
-			i = ft_strlen(dir);
-			while(dir[i] != '/')
-				i--;
-			dir[i] = '\0';
-		}
-		chdir(dir);
-		change_envp(envp, "PWD=", dir);
+		cd(main);
 	}
 	else if(ft_strncmp(main->command[0], "exit", 64))
 	{
@@ -77,7 +66,6 @@ int main(int argc, __unused char **argv, char **envp)
 		sig_init();
 		while(main.exit == 0)
 		{
-			ft_putstr_fd("\033[0;36m\033[1m minishell ▸ \033[0m", STDERR);
 			parse(&main, command);
 			if(executor(&main, main.envp))
 			{

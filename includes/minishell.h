@@ -13,6 +13,8 @@
 # include <limits.h>
 # include <errno.h>
 # include <signal.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 # define STDIN 0
 # define STDOUT 1
@@ -54,6 +56,8 @@ void    init_envp(t_main *main, char **envp);
 void    export(t_main *main, char *variable, char *value);
 void    free_envp(t_main *main);
 void	redirect(t_main *main);
+
+void    cd(t_main *main);
 
 void	sig_int(int code);
 void	sig_quit(int code);

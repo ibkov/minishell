@@ -4,7 +4,7 @@ CC = gcc
 
 CFLAGS = -Wall -Wextra -Werror -I includes/ -I libft/
 
-LIBFT = -L. -lft 
+LIBFT = -L. -lft -lreadline
 
 PARSER_DIR = parser/
 
@@ -26,6 +26,7 @@ SRC_LIST = minishell.c \
 			envp.c \
 			signals.c \
 			redirect.c \
+			built-in/cd.c \
 
 SRC = $(addprefix $(SRC_DIR), $(SRC_LIST))
 
@@ -51,7 +52,7 @@ $(NAME): $(OBJ) libft
 
 %.o: %.c
 	@printf "\033[0;33mGenerating minishell objects... %-33.33s\r" $@
-	@${CC} ${CFLAGS} -c $< -o $@
+	@${CC} -g ${CFLAGS} -c $< -o $@
 
 clean:
 	@echo "\033[0;31mCleaning libft..."

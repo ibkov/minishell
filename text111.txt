@@ -1,0 +1,12 @@
+Makefile
+README.md
+description
+gnl
+includes
+libft
+libft.a
+minishell
+parser
+src
+text.txt
+text111.txt
