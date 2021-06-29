@@ -29,6 +29,7 @@ SRC_LIST = minishell.c \
 			built-in/unset.c \
 			built-in/cd.c \
 			built-in/export.c \
+			built-in/pwd.c \
 			built-in/exit.c \
 
 

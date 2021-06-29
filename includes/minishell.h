@@ -53,11 +53,13 @@ typedef struct s_main
     char    **envp;
     int     exit;
     int     quit;
+	int		exit_code;
 	t_token	token;
 	t_redirect redirect;
 }                   t_main;
 void    parse(__unused t_main *main);
 char    *del_spaces(char *str);
+int 	argv_len(char **p);
 char    *create_path(char **components, int len);
 int     count_len(char **argv);
 void    change_envp(char **envp, char *variable, char *value);
@@ -66,13 +68,15 @@ void    init_envp(t_main *main, char **envp);
 void    sh_export(t_main *main);
 void 	sh_unset(t_main *main);
 void 	sh_env(char **envp);
+void 	sh_pwd(t_main *main);
+int 	sh_exit(t_main *main);
 void    cd(t_main *main);
 void 	echo(t_main *main);
 // void	exit(t_main *main);
 
 void    free_argv(char **argv);
-void	redirect(t_redirect *redirect, char *redirect_file);
-
+// void	redirect(t_redirect *redirect, char *redirect_file);
+void	redirect(t_main *main);
 void	sig_int(int code);
 void	sig_quit(int code);
 void	sig_init(void);

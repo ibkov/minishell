@@ -35,12 +35,17 @@ void    cd(t_main *main)
 	{
         new_dir = cd_down(current_dir, main->envp);
 	}
-    else if(ft_strncmp(main->tokens[1], current_dir, ft_strlen(current_dir)) == 0)
+    else if(ft_strncmp(main->tokens[1], "/", 1) == 0)
     {
         change_envp(main->envp, "OLDPWD=", current_dir);
         new_dir = ft_strdup(main->tokens[1]);
     }
-    else 
+    else if(ft_strncmp(main->tokens[1], ".", 1) == 0)
+    {
+        new_dir = ft_strdup(current_dir);
+        change_envp(main->envp, "OLDPWD=", current_dir);
+    }
+    else
     {
         new_dir = cd_rel(current_dir, main->envp, main->tokens[1]);
     }

@@ -39,7 +39,7 @@ t_token	*new_token(void *content)
 	return (new_elem);
 }
 
-void    parse(__unused t_main *main)
+void   parse(__unused t_main *main)
 {
     int i;
     char *cmd;
@@ -48,26 +48,25 @@ void    parse(__unused t_main *main)
     i = 0;
     signal(SIGINT, &sig_int);
 	signal(SIGQUIT, &sig_quit);
-    cmd = readline("\033[0;36m\033[1m minishell ▸ \033[0m");
+    cmd = readline("\033[0;36m\033[1mminishell ▸ \033[0m");
     if (cmd == NULL && (main->exit = 1))
     {
         ft_putendl_fd("exit", STDERR);
         exit(0);
     }
-    add_history(cmd);
-    main->base_command = ft_strdup(cmd); //malloc
-    if (is_redirect(cmd, &main->redirect) > 0)
+    else if (cmd != '\0')
     {
-        p = ft_split(cmd, main->redirect.type);
-        main->tokens = ft_split(p[0], ' ');
-        while (p[1][i] == main->redirect.type || p[1][i] == ' ')
+        add_history(cmd);
+        main->base_command = ft_strdup(cmd); //malloc
+        if (is_redirect(cmd, &main->redirect) > 0)
         {
-            i++;
+            p = ft_split(cmd, main->redirect.type);
+            main->redirect.redirect_file = del_spaces(p[1]);
+            main->tokens = ft_split(p[0], ' ');
+            free_argv(p);
         }
-        main->redirect.redirect_file = ft_strdup(&p[1][i]);
-        redirect(&main->redirect, main->redirect.redirect_file);
-        free_argv(p);
+        else if(cmd != NULL)
+            main->tokens = ft_split(cmd, ' ');
     }
-    else
-        main->tokens = ft_split(cmd, ' ');
+    free(cmd);
 }

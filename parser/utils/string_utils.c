@@ -1,5 +1,17 @@
 #include "minishell.h"
 
+int argv_len(char **p)
+{
+    int i;
+
+    i = 0;
+    while(p[i] != NULL)
+    {
+        i++;
+    }
+    return (i);
+}
+
 char *del_spaces(char *str)
 {
     int len;
