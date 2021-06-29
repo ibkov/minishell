@@ -1,14 +1,20 @@
 #include "minishell.h"
 
-int arg_in_env(t_main *main, char *str, int j){
+int arg_in_env(t_main *main, char *str, int j)
+{
     char **temp_str;
 
-    while(main->envp[j]){
+    while(main->envp[j])
+    {
         temp_str = ft_split(main->envp[j], '=');
         if (ft_strncmp(str, temp_str[0], ft_strlen(temp_str[0])) == 0)
+        {
+            free_argv(temp_str);
             return (1);
+        }
         j++;
     }
+    free_argv(temp_str);
     return (0);
  
 }
@@ -27,7 +33,8 @@ void create_env(t_main *main, int i, int j, int k)
     char **tmp_env;
     char **temp_str;
 
-    if(arg_in_env(main, main->tokens[i], 0)){
+    if(arg_in_env(main, main->tokens[i], 0))
+    {
         tmp_env = (char **)malloc((count_env_args(main, 0)) * sizeof(char *));
             while(main->envp[j] != NULL)
             {
@@ -43,7 +50,7 @@ void create_env(t_main *main, int i, int j, int k)
         tmp_env[k] = NULL;
         free_argv(main->envp);
         main->envp = tmp_env;
-        }
+    }
 }
 
 void sh_unset(t_main *main)

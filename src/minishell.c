@@ -60,7 +60,7 @@ void execve_builtin(t_main *main)
 int executor(__unused t_main *main, char **envp)
 {
 	simple_command(main);
-	if (is_builtin(&main->base_command[0]))
+	if (is_builtin(main->tokens[0]))
 	{
 		execve_builtin(main);
 	}
