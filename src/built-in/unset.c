@@ -1,5 +1,19 @@
 #include "minishell.h"
 
+int check_invalid(char **lst_argv, int i, int check){
+    if (ft_isdigit(lst_argv[++i][0]))
+        return (1);
+    while (lst_argv[i] && check)
+    {
+        if (ft_isdigit(lst_argv[i][0]))
+            check = 0;
+        i++;
+    }
+    if (check)
+        return (0);
+    return (i - 1);
+}
+
 void sh_unset(t_main *main)
 {
     int i;
@@ -13,8 +27,8 @@ void sh_unset(t_main *main)
     lst_argv = main->tokens;
     if (lst_argv[1] == 0)
         printf("%s", "unset: not enough arguments\n");
-    else if (ft_isdigit(lst_argv[1][0]))
-        printf("unset: %s: invalid parameter name\n", lst_argv[1]);
+    else if (check_invalid(lst_argv, 0, 1))
+        printf("unset: %s: invalid parameter name\n", lst_argv[check_invalid(lst_argv, 0, 1)]);
     else
     {
         while(main->envp[i] != 0)
