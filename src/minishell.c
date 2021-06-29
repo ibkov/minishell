@@ -5,12 +5,10 @@ t_sig	g_sig;
 
 int executor(__unused t_main *main, char **envp)
 {
-	int i = 0;
-	
-	main->unix_path = ft_strjoin("/bin/", main->command[0]); //malloc √
+	main->unix_path = ft_strjoin("/bin/", main->tokens[0]);
 	if (ft_strncmp(&main->base_command[0],"export", 6) == 0)
 	{
-		export(main, "TEST=", "test");
+		sh_export(main);
 	}
 	else if (ft_strncmp(&main->base_command[0], "unset", 5) == 0)
 	{
@@ -18,23 +16,19 @@ int executor(__unused t_main *main, char **envp)
 	}
 	else if (ft_strncmp(&main->base_command[0],"env", 3) == 0)
 	{
-		while (envp[i] != NULL)
-		{
-			printf("%s\n", envp[i++]);
-		}
+		sh_env(main->envp);
 	}
 	else if (ft_strncmp(&main->base_command[0],"cd", 2) == 0)
 	{
 		cd(main);
 	}
-	else if(ft_strncmp(main->command[0], "exit", 64))
+	else if(ft_strncmp(main->tokens[0], "exit", 64))
 	{
 		g_sig.pid = fork();
 		if(g_sig.pid == 0)
 		{
-			redirect(main);
-			execve(main->unix_path, main->command, envp);
-			printf("zsh: command not found: %s\n", main->command[0]);
+			execve(main->unix_path, main->tokens, envp);
+			printf("zsh: command not found: %s\n", main->tokens[0]);
 			exit(0);
 		}
 		else if (g_sig.pid > 0)
@@ -61,8 +55,8 @@ int main(int argc, __unused char **argv, char **envp)
 	if(argc == 1)
 	{
 		init_envp(&main, envp);
-		change_envp(main.envp, "SHLVL=", "2");
 		sig_init();
+		change_envp(main.envp, "SHLVL=", "2");
 		while(main.exit == 0)
 		{
 			parse(&main);
@@ -71,8 +65,9 @@ int main(int argc, __unused char **argv, char **envp)
 				break;
 			}
 			free(main.base_command);
-			free_argv(main.command);
+			free_argv(main.tokens);
 		}
 	}
+	free_argv(main.envp);
 	exit (0);
 }

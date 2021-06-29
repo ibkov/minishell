@@ -32,21 +32,29 @@ extern t_sig g_sig;
 
 typedef struct	s_token
 {
-	char			*str;
+	char			*content;
 	int				type;
 	struct s_token	*prev;
 	struct s_token	*next;
 }				t_token;
 
+typedef struct	s_redirect
+{
+	int				amount;
+	int				type;
+	char			*redirect_file;
+}				t_redirect;
+
 typedef struct s_main
 {
     char    *base_command;
-    char    **command;
+    char    **tokens;
     char    *unix_path;
     char    **envp;
-	char 	*cmd;
     int     exit;
     int     quit;
+	t_token	token;
+	t_redirect redirect;
 }                   t_main;
 void    parse(__unused t_main *main);
 char    *del_spaces(char *str);
@@ -54,16 +62,19 @@ char    *create_path(char **components, int len);
 int     count_len(char **argv);
 void    change_envp(char **envp, char *variable, char *value);
 void    init_envp(t_main *main, char **envp);
-void    export(t_main *main, char *variable, char *value);
-void    free_argv(char **argv);
-void	redirect(t_main *main);
 
+void    sh_export(t_main *main);
+void 	sh_unset(t_main *main);
+void 	sh_env(char **envp);
 void    cd(t_main *main);
 void 	echo(t_main *main);
+// void	exit(t_main *main);
+
+void    free_argv(char **argv);
+void	redirect(t_redirect *redirect, char *redirect_file);
 
 void	sig_int(int code);
 void	sig_quit(int code);
 void	sig_init(void);
-void 	sh_unset(t_main *main);
 
 #endif

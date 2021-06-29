@@ -31,18 +31,18 @@ void    cd(t_main *main)
     char *new_dir;
 
     current_dir = getcwd(NULL, 100);
-	if (ft_strncmp(main->command[1],"..", 2) == 0)
+	if (ft_strncmp(main->tokens[1],"..", 2) == 0)
 	{
         new_dir = cd_down(current_dir, main->envp);
 	}
-    else if(ft_strncmp(main->command[1], current_dir, ft_strlen(current_dir)) == 0)
+    else if(ft_strncmp(main->tokens[1], current_dir, ft_strlen(current_dir)) == 0)
     {
         change_envp(main->envp, "OLDPWD=", current_dir);
-        new_dir = ft_strdup(main->command[1]);
+        new_dir = ft_strdup(main->tokens[1]);
     }
     else 
     {
-        new_dir = cd_rel(current_dir, main->envp, main->command[1]);
+        new_dir = cd_rel(current_dir, main->envp, main->tokens[1]);
     }
 	chdir(new_dir);
 	change_envp(main->envp, "PWD=", new_dir);
