@@ -43,6 +43,7 @@ typedef struct	s_redirect
 	int				amount;
 	int				type;
 	char			*redirect_file;
+	int				base_fd;
 }				t_redirect;
 
 typedef struct s_main
@@ -67,7 +68,7 @@ void    init_envp(t_main *main, char **envp);
 
 void    sh_export(t_main *main);
 void 	sh_unset(t_main *main);
-void 	sh_env(char **envp);
+void 	sh_env(t_main *main);
 void 	sh_pwd(t_main *main);
 int 	sh_exit(t_main *main);
 void    cd(t_main *main);

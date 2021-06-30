@@ -18,8 +18,8 @@ static void simple_command(t_main *main)
 
 int		is_builtin(char *command)
 {
-	if (ft_strcmp(command, "echo") == 0)
-		return (1);
+	// if (ft_strcmp(command, "echo") == 0)
+	// 	return (1);
 	if (ft_strcmp(command, "cd") == 0)
 		return (1);
 	if (ft_strcmp(command, "pwd") == 0)
@@ -45,7 +45,7 @@ void execve_builtin(t_main *main)
 	}
 	else if (ft_strncmp(&main->base_command[0],"env", 3) == 0)
 	{
-		sh_env(main->envp);
+		sh_env(main);
 	}
 	else if (ft_strncmp(&main->base_command[0],"cd", 2) == 0)
 	{
