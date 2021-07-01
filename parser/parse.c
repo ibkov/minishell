@@ -49,6 +49,7 @@ void   parse(__unused t_main *main)
     signal(SIGINT, &sig_int);
 	signal(SIGQUIT, &sig_quit);
     cmd = readline("\033[0;36m\033[1mminishell ▸ \033[0m");
+    add_history(cmd);
     if (cmd == NULL && (main->exit = 1))
     {
         ft_putendl_fd("exit", STDERR);
@@ -56,8 +57,7 @@ void   parse(__unused t_main *main)
     }
     else if (cmd != '\0')
     {
-        add_history(cmd);
-        main->base_command = ft_strdup(cmd); //malloc
+        main->base_command = ft_strdup(cmd);
         if (is_redirect(cmd, &main->redirect) > 0)
         {
             p = ft_split(cmd, main->redirect.type);
