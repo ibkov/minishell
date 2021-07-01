@@ -2,6 +2,7 @@
 
 void sh_pwd(t_main *main)
 {
+	main->tokens = create_argv(main->token);
     g_sig.pid = fork();
 	if(g_sig.pid == 0)
 	{
