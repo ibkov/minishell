@@ -57,6 +57,17 @@ void execve_builtin(t_main *main)
 	}
 }
 
+// t_token *get_token(t_main *main, int id)
+// {
+// 	int i = 0;
+
+// 	while ()
+// 	{
+// 		/* code */
+// 	}
+	
+// }
+
 int executor(__unused t_main *main, char **envp)
 {
 	simple_command(main);
@@ -103,16 +114,15 @@ int main(int argc, __unused char **argv, char **envp)
 		change_envp(main.envp, "SHLVL=", "2");
 		while(main.exit == 0)
 		{
-			parse(&main);
-			if(argv_len(main.tokens) > 0)
+			if (parse(&main))
 			{
-				if(executor(&main, main.envp))
-				{
-					break;
-				}
+					if(executor(&main, main.envp))
+					{
+						break;
+					}
+				// free_argv(main.tokens);
+				// free(main.base_command);
 			}
-			free_argv(main.tokens);
-			free(main.base_command);
 		}
 	}
 	free_argv(main.envp);
