@@ -179,7 +179,7 @@ int		quotes(char *line, int index)
 
 	i = 0;
 	open = 0;
-	while (line[i] && i != index)
+	while (line[i] && i != index) // сега
 	{
 		if (i > 0 && line[i - 1] == '\\')
 			;
@@ -278,20 +278,27 @@ int   parse(__unused t_main *main)
     signal(SIGINT, &sig_int);
 	signal(SIGQUIT, &sig_quit);
     cmd = readline("\033[0;36m\033[1mminishell ▸ \033[0m");
-    add_history(cmd);
-    if (quote_check(main, &cmd))
-		return (0);
-    cmd = space_line(cmd);
-    main->token = create_tokens(cmd);
-	// while (main->token->next)
-	// {
-	// 	printf("%s %d\n", main->token->str, main->token->type);
-	// 	main->token = main->token->next;
-	// }
-	// printf("%s %d\n", main->token->str, main->token->type);
-	if (main->token != NULL)
+	if (cmd == NULL && (main->exit = 1))
 	{
+		ft_putstr_fd("\b\bexit\n", STDERR);
+	}
+	if (cmd && cmd[0])
+	{
+			add_history(cmd);
+		if (quote_check(main, &cmd))
+			return (0);
+		cmd = space_line(cmd);
+		main->token = create_tokens(cmd);
+		// while (main->token->next)
+		// {
+		// 	printf("%s %d\n", main->token->str, main->token->type);
+		// 	main->token = main->token->next;
+		// }
+		// printf("%s %d\n", main->token->str, main->token->type);
 		return (1);
 	}
-    return (0);
+	else
+	{
+		return (0);
+	}
 }
