@@ -283,6 +283,12 @@ int   parse(__unused t_main *main)
 		return (0);
     cmd = space_line(cmd);
     main->token = create_tokens(cmd);
+	// while (main->token->next)
+	// {
+	// 	printf("%s %d\n", main->token->str, main->token->type);
+	// 	main->token = main->token->next;
+	// }
+	// printf("%s %d\n", main->token->str, main->token->type);
 	if (main->token != NULL)
 	{
 		return (1);

@@ -3,19 +3,6 @@
 
 t_sig	g_sig;
 
-static void simple_command(t_main *main)
-{
-	char **p;
-
-	if (ft_strncmp(&main->base_command[0],"/bin/", 5) == 0)
-	{
-		p = ft_split(&main->base_command[0], '/');
-		main->tokens = ft_split(p[1], ' ');
-		free_argv(p);
-	}
-	main->unix_path = ft_strjoin("/bin/", main->tokens[0]);
-}
-
 int		is_builtin(char *command)
 {
 	// if (ft_strcmp(command, "echo") == 0)
@@ -35,24 +22,23 @@ int		is_builtin(char *command)
 
 void execve_builtin(t_main *main)
 {
-	if (ft_strncmp(&main->base_command[0],"export", 6) == 0)
+	if (ft_strncmp(main->token->str,"export", 6) == 0)
 	{
 		sh_export(main);
 	}
 	else if (ft_strncmp(main->token->str, "unset", 5) == 0)
 	{
-		printf("%s", "234");
 		sh_unset(main);
 	}
-	else if (ft_strncmp(&main->base_command[0],"env", 3) == 0)
+	else if (ft_strncmp(main->token->str,"env", 3) == 0)
 	{
 		sh_env(main);
 	}
-	else if (ft_strncmp(&main->base_command[0],"cd", 2) == 0)
+	else if (ft_strncmp(main->token->str,"cd", 2) == 0)
 	{
 		cd(main);
 	}
-	else if (ft_strncmp(&main->base_command[0],"pwd", 3) == 0)
+	else if (ft_strncmp(main->token->str,"pwd", 3) == 0)
 	{
 		sh_pwd(main);
 	}
@@ -69,10 +55,9 @@ void execve_builtin(t_main *main)
 	
 // }
 
-int xecutor(__unused t_main *main, char **envp)
+int executor(__unused t_main *main, char **envp)
 {
-	simple_command(main);
-	if (is_builtin(main->tokens[0]))
+	if (is_builtin(main->token->str))
 	{
 		execve_builtin(main);
 	}
@@ -94,10 +79,8 @@ int xecutor(__unused t_main *main, char **envp)
 	else
 	{
 		sh_exit(main);
-		free(main->unix_path);
 		return (1);
 	}
-	free(main->unix_path);
 	return (0);
 }
 

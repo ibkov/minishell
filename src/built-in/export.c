@@ -18,6 +18,7 @@ void sh_export(t_main *main)
     char **envp;
     char    **p;
 
+    printf("in export\n");
     i = 0;
     while (main->envp[i] != NULL)
         i++;
@@ -29,9 +30,8 @@ void sh_export(t_main *main)
         envp[i] = ft_strdup(main->envp[i]);
         i++;
     }
-    p = get_props(main->tokens[1]);
+    p = get_props(main->token->next->str);
     envp[i] = ft_strjoin(p[0], p[1]);
-    free_argv(main->envp);
     free_argv(p);
     main->envp = envp;
 }
