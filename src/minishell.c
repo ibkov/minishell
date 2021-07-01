@@ -39,8 +39,9 @@ void execve_builtin(t_main *main)
 	{
 		sh_export(main);
 	}
-	else if (ft_strncmp(&main->base_command[0], "unset", 5) == 0)
+	else if (ft_strncmp(main->token->str, "unset", 5) == 0)
 	{
+		printf("%s", "234");
 		sh_unset(main);
 	}
 	else if (ft_strncmp(&main->base_command[0],"env", 3) == 0)
@@ -68,7 +69,7 @@ void execve_builtin(t_main *main)
 	
 // }
 
-int executor(__unused t_main *main, char **envp)
+int xecutor(__unused t_main *main, char **envp)
 {
 	simple_command(main);
 	if (is_builtin(main->tokens[0]))
