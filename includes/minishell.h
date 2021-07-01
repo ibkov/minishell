@@ -20,6 +20,15 @@
 # define STDOUT 1
 # define STDERR 2
 
+# define EMPTY 0
+# define CMD 1
+# define ARG 2
+# define TRUNC 3
+# define APPEND 4
+# define INPUT 5
+# define PIPE 6
+# define END 7
+
 typedef struct	s_sig
 {
 	int				sigint;
@@ -32,7 +41,7 @@ extern t_sig g_sig;
 
 typedef struct	s_token
 {
-	char			*content;
+	char			*str;
 	int				type;
 	struct s_token	*prev;
 	struct s_token	*next;
@@ -55,10 +64,10 @@ typedef struct s_main
     int     exit;
     int     quit;
 	int		exit_code;
-	t_token	token;
+	t_token	*token;
 	t_redirect redirect;
 }                   t_main;
-void    parse(__unused t_main *main);
+int    parse(__unused t_main *main);
 char    *del_spaces(char *str);
 int 	argv_len(char **p);
 char    *create_path(char **components, int len);

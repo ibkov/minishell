@@ -1,72 +1,291 @@
 #include "minishell.h"
 
-static int is_redirect(char *str, t_redirect *redirect)
+// static int is_pipe(char *str)
+// {
+//     int i;
+
+//     i = 0;
+//     while (*str)
+//     {
+//         if (*str == '|' && *(str + 1) != '|')
+//         {
+//             i++;
+//         }
+//         else
+//         {
+//             return (0);
+//         }
+//         str++;
+//     }
+//     return (i);
+// }
+
+// static int is_redirect(char *str, t_redirect *redirect)
+// {
+//     redirect->amount = 0;
+//     while (*str)
+//     {
+//         if (*str == '>' || *str == '<')
+//         {
+//             if (redirect->type != *str && redirect->amount != 0)
+//             {
+//                 printf("Redirect error\n");
+//                 return (-1);
+//             }
+//             else
+//             {
+//                 redirect->type = *str;
+//                 if(redirect->amount++ > 2)
+//                 {
+//                     printf("Redirect error\n");
+//                     return (-1);
+//                 }
+//             }
+//         }
+//         str++;
+//     }
+//     return (redirect->amount);
+// }
+
+int		ignore_sep(char *line, int i)
 {
-    redirect->amount = 0;
-    while (*str)
+	if (line[i] && line[i] == '\\' && line[i + 1] && line[i + 1] == ';')
+		return (1);
+	else if (line[i] && line[i] == '\\' && line[i + 1] && line[i + 1] == '|')
+		return (1);
+	else if (line[i] && line[i] == '\\' && line[i + 1] && line[i + 1] == '>')
+		return (1);
+	else if (line[i] && line[i] == '\\' && line[i + 1] && line[i + 1] == '>'
+				&& line[i + 2] && line[i + 2] == '>')
+		return (1);
+	return (0);
+}
+
+int		next_alloc(char *line, int *i)
+{
+	int		count;
+	int		j;
+	char	c;
+
+	count = 0;
+	j = 0;
+	c = ' ';
+	while (line[*i + j] && (line[*i + j] != ' ' || c != ' '))
+	{
+		if (c == ' ' && (line[*i + j] == '\'' || line[*i + j] == '\"'))
+			c = line[*i + j++];
+		else if (c != ' ' && line[*i + j] == c)
+		{
+			count += 2;
+			c = ' ';
+			j++;
+		}
+		else
+			j++;
+		if (line[*i + j - 1] == '\\')
+			count--;
+	}
+	return (j - count + 1);
+}
+
+t_token	*next_token(char *line, int *i)
+{
+	t_token	*token;
+	int		j;
+	char	c;
+
+	j = 0;
+	c = ' ';
+	if (!(token = malloc(sizeof(t_token)))
+	|| !(token->str = malloc(sizeof(char) * next_alloc(line, i))))
+		return (NULL);
+	while (line[*i] && (line[*i] != ' ' || c != ' '))
+	{
+		if (c == ' ' && (line[*i] == '\'' || line[*i] == '\"'))
+			c = line[(*i)++];
+		else if (c != ' ' && line[*i] == c)
+		{
+			c = ' ';
+			(*i)++;
+		}
+		else if (line[*i] == '\\' && (*i)++)
+			token->str[j++] = line[(*i)++];
+		else
+			token->str[j++] = line[(*i)++];
+	}
+	token->str[j] = '\0';
+	return (token);
+}
+
+void	type_arg(t_token *token, int separator)
+{
+	if (ft_strcmp(token->str, "") == 0)
+		token->type = EMPTY;
+	else if (ft_strcmp(token->str, ">") == 0 && separator == 0)
+		token->type = TRUNC;
+	else if (ft_strcmp(token->str, ">>") == 0 && separator == 0)
+		token->type = APPEND;
+	else if (ft_strcmp(token->str, "<") == 0 && separator == 0)
+		token->type = INPUT;
+	else if (ft_strcmp(token->str, "|") == 0 && separator == 0)
+		token->type = PIPE;
+	else if (ft_strcmp(token->str, ";") == 0 && separator == 0)
+		token->type = END;
+	else if (token->prev == NULL || token->prev->type >= TRUNC)
+		token->type = CMD;
+	else
+		token->type = ARG;
+}
+
+static t_token *create_tokens(char *line)
+{
+	t_token	*prev;
+	t_token	*next;
+	int		i;
+	int		sep;
+
+	prev = NULL;
+	next = NULL;
+	i = 0;
+	while (line[i] == ' ')
     {
-        if (*str == '>' || *str == '<')
-        {
-            if (redirect->type != *str && redirect->amount != 0)
-            {
-                printf("Redirect error\n");
-                return (-1);
-            }
-            else
-            {
-                redirect->type = *str;
-                if(redirect->amount++ > 2)
-                {
-                    printf("Redirect error\n");
-                    return (-1);
-                }
-            }
-        }
-        str++;
+        i++;
     }
-    return (redirect->amount);
+	while (line[i])
+	{
+		sep = ignore_sep(line, i);
+		next = next_token(line, &i);
+		next->prev = prev;
+		if (prev)
+			prev->next = next;
+		prev = next;
+		type_arg(next, sep);
+		while (line[i] == ' ')
+        {
+            i++;
+        }
+	}
+	if (next)
+		next->next = NULL;
+	while (next && next->prev)
+		next = next->prev;
+	return (next);
 }
 
-t_token	*new_token(void *content)
+int		quotes(char *line, int index)
 {
-	t_token	*new_elem;
+	int	i;
+	int	open;
 
-	new_elem = malloc(sizeof(t_token));
-	if (!new_elem)
-		return (0);
-	new_elem->content = content;
-	new_elem->next = 0;
-	return (new_elem);
+	i = 0;
+	open = 0;
+	while (line[i] && i != index)
+	{
+		if (i > 0 && line[i - 1] == '\\')
+			;
+		else if (open == 0 && line[i] == '\"')
+			open = 1;
+		else if (open == 0 && line[i] == '\'')
+			open = 2;
+		else if (open == 1 && line[i] == '\"')
+			open = 0;
+		else if (open == 2 && line[i] == '\'')
+			open = 0;
+		i++;
+	}
+	return (open);
 }
 
-void   parse(__unused t_main *main)
+int		is_sep(char *line, int i)
+{
+	if (i > 0 && line[i - 1] == '\\' && ft_strchr("<>|;", line[i]))
+		return (0);
+	else if (ft_strchr("<>|;", line[i]) && quotes(line, i) == 0)
+		return (1);
+	else
+		return (0);
+}
+
+char	*space_alloc(char *line)
+{
+	char	*new;
+	int		count;
+	int		i;
+
+	count = 0;
+	i = 0;
+	while (line[i])
+	{
+		if (is_sep(line, i))
+			count++;
+		i++;
+	}
+	if (!(new = malloc(sizeof(char) * (i + 2 * count + 1))))
+		return (NULL);
+	return (new);
+}
+
+char	*space_line(char *line)
+{
+	char	*new;
+	int		i;
+	int		j;
+
+	i = 0;
+	j = 0;
+	new = space_alloc(line);
+	while (new && line[i])
+	{
+		if (quotes(line, i) != 2 && line[i] == '$' && i && line[i - 1] != '\\')
+			new[j++] = (char)(-line[i++]);
+		else if (quotes(line, i) == 0 && is_sep(line, i))
+		{
+			new[j++] = ' ';
+			new[j++] = line[i++];
+			if (quotes(line, i) == 0 && line[i] == '>')
+				new[j++] = line[i++];
+			new[j++] = ' ';
+		}
+		else
+			new[j++] = line[i++];
+	}
+	new[j] = '\0';
+	free(line);
+    line = NULL;
+	return (new);
+}
+
+int		quote_check(__unused t_main *mini, char **line)
+{
+	if (quotes(*line, 2147483647))
+	{
+		ft_putendl_fd("minishell: syntax error with open quotes", STDERR);
+		free(*line);
+        *line = NULL;
+		// mini->ret = 2;
+		// mini->start = NULL;
+		return (1);
+	}
+	return (0);
+}
+
+int   parse(__unused t_main *main)
 {
     int i;
     char *cmd;
-    char **p;
 
     i = 0;
     signal(SIGINT, &sig_int);
 	signal(SIGQUIT, &sig_quit);
     cmd = readline("\033[0;36m\033[1mminishell ▸ \033[0m");
     add_history(cmd);
-    if (cmd == NULL && (main->exit = 1))
-    {
-        ft_putendl_fd("exit", STDERR);
-        exit(0);
-    }
-    else if (cmd != '\0')
-    {
-        main->base_command = ft_strdup(cmd);
-        if (is_redirect(cmd, &main->redirect) > 0)
-        {
-            p = ft_split(cmd, main->redirect.type);
-            main->redirect.redirect_file = del_spaces(p[1]);
-            main->tokens = ft_split(p[0], ' ');
-            free_argv(p);
-        }
-        else if(cmd != NULL)
-            main->tokens = ft_split(cmd, ' ');
-    }
-    free(cmd);
+    if (quote_check(main, &cmd))
+		return (0);
+    cmd = space_line(cmd);
+    main->token = create_tokens(cmd);
+	if (main->token != NULL)
+	{
+		return (1);
+	}
+    return (0);
 }

@@ -27,3 +27,19 @@ VSCODE_GIT_ASKPASS_NODE=/Applications/Visual Studio Code.app/Contents/Frameworks
 VSCODE_GIT_ASKPASS_MAIN=/Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass-main.js
 TERM=xterm-256color
 _=/usr/bin/env
+Makefile
+README.md
+description
+env.txt
+gg.txt
+gnl
+includes
+libft
+libft.a
+minishell
+minishell.dSYM
+parser
+qwdnwebfw.txt
+src
+super.txt
+yy.txt
