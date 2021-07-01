@@ -71,13 +71,17 @@ typedef struct s_main
 	t_token	*token;
 	t_redirect redirect;
 }                   t_main;
-int    parse(__unused t_main *main);
+int    	parse(__unused t_main *main);
 char    *del_spaces(char *str);
 int 	argv_len(char **p);
 char    *create_path(char **components, int len);
 int     count_len(char **argv);
 void    change_envp(char **envp, char *variable, char *value);
 void    init_envp(t_main *main, char **envp);
+
+char 	**create_argv(t_token *token);
+int		search_binary(char *command, char **envp, t_main *main);
+char 	*get_envi_val(char **envp, char *var);
 
 void    sh_export(t_main *main);
 void 	sh_unset(t_main *main);

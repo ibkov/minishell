@@ -26,6 +26,7 @@ SRC_LIST = minishell.c \
 			envp.c \
 			signals.c \
 			redirect.c \
+			bin.c \
 			built-in/unset.c \
 			built-in/cd.c \
 			built-in/export.c \

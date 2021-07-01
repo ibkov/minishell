@@ -30,6 +30,7 @@ void init_envp(t_main *main, char **envp)
         main->envp[i] = ft_strdup(envp[i]);
         i++;
     }
+    main->unix_path = NULL;
 }
 
 void change_envp(char **envp, char *variable, char *value)
