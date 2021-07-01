@@ -22,7 +22,7 @@ int		is_builtin(char *command)
 
 void execve_builtin(t_main *main)
 {
-	if (ft_strncmp(main->token->str,"export", 6) == 0)
+	if (ft_strncmp(main->token->str, "export", 6) == 0)
 	{
 		sh_export(main);
 	}
