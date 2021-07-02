@@ -3,10 +3,8 @@
 
 t_sig	g_sig;
 
-int		is_builtin(char *command, t_main *main)
+int		is_builtin(char *command)
 {
-	// if (ft_strcmp(command, "echo") == 0)
-	// 	return (1);
 	if (ft_strcmp(command, "cd") == 0)
 		return (1);
 	if (ft_strcmp(command, "env") == 0)
@@ -15,12 +13,31 @@ int		is_builtin(char *command, t_main *main)
 		return (1);
 	if (ft_strcmp(command, "unset") == 0)
 		return (1);
+	return (0);
+}
+
+void execve_builtin(t_main *main)
+{
+	if (ft_strncmp(main->token->str,"export", 6) == 0)
+		sh_export(main);
+	else if (ft_strncmp(main->token->str, "unset", 5) == 0)
+		sh_unset(main);
+	else if (ft_strncmp(main->token->str,"env", 3) == 0)
+		sh_env(main);
+	else if (ft_strncmp(main->token->str,"cd", 2) == 0)
+		cd(main);
+	else if (ft_strncmp(main->token->str,"pwd", 3) == 0)
+		sh_pwd(main);
+}
+
+int		is_bin(char *command, t_main *main)
+{
 	if (search_binary(command, main->envp, main))
 		return (1);
 	return (0);
 }
 
-void execve_builtin_bin(t_main *main)
+void execve_bin(t_main *main)
 {
 	main->tokens = create_argv(main->token);
 	printf("%s\n", main->unix_path);
@@ -38,27 +55,15 @@ void execve_builtin_bin(t_main *main)
 		perror("Error fork\n");
 }
 
-void execve_builtin(t_main *main)
-{
-	if (ft_strncmp(main->token->str,"export", 6) == 0)
-		sh_export(main);
-	else if (ft_strncmp(main->token->str, "unset", 5) == 0)
-		sh_unset(main);
-	else if (ft_strncmp(main->token->str,"env", 3) == 0)
-		sh_env(main);
-	else if (ft_strncmp(main->token->str,"cd", 2) == 0)
-		cd(main);
-	else if (ft_strncmp(main->token->str,"pwd", 3) == 0)
-		sh_pwd(main);
-	else
-		execve_builtin_bin(main);
-}
-
 int executor(__unused t_main *main, char **envp)
 {
-	if (is_builtin(main->token->str, main))
+	if (is_builtin(main->token->str))
 	{
 		execve_builtin(main);
+	}
+	if(is_bin(main->token->str, main))
+	{
+		execve_bin(main);
 	}
 	else if(ft_strncmp(main->token->str, "exit", 4))
 	{

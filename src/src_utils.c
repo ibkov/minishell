@@ -39,6 +39,7 @@ char **create_argv(t_token *token)
     i = 1;
     j = 0;
     p = token;
+    
     if (token->next)
        token = token->next;
     while (token->type == ARG && token->next)
@@ -74,4 +75,10 @@ char *get_envi_val(char **envp, char *var)
         i++;
     }
     return (NULL);
+}
+
+int str_error(char *str, int ret)
+{
+    printf("%s\n", str);
+    return (ret);
 }

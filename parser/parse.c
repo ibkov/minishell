@@ -1,52 +1,5 @@
 #include "minishell.h"
 
-// static int is_pipe(char *str)
-// {
-//     int i;
-
-//     i = 0;
-//     while (*str)
-//     {
-//         if (*str == '|' && *(str + 1) != '|')
-//         {
-//             i++;
-//         }
-//         else
-//         {
-//             return (0);
-//         }
-//         str++;
-//     }
-//     return (i);
-// }
-
-// static int is_redirect(char *str, t_redirect *redirect)
-// {
-//     redirect->amount = 0;
-//     while (*str)
-//     {
-//         if (*str == '>' || *str == '<')
-//         {
-//             if (redirect->type != *str && redirect->amount != 0)
-//             {
-//                 printf("Redirect error\n");
-//                 return (-1);
-//             }
-//             else
-//             {
-//                 redirect->type = *str;
-//                 if(redirect->amount++ > 2)
-//                 {
-//                     printf("Redirect error\n");
-//                     return (-1);
-//                 }
-//             }
-//         }
-//         str++;
-//     }
-//     return (redirect->amount);
-// }
-
 int		ignore_sep(char *line, int i)
 {
 	if (line[i] && line[i] == '\\' && line[i + 1] && line[i + 1] == ';')

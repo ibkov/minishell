@@ -99,4 +99,5 @@ void	sig_int(int code);
 void	sig_quit(int code);
 void	sig_init(void);
 
+int str_error(char *str, int ret);
 #endif
