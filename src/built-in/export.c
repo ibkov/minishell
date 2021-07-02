@@ -39,13 +39,31 @@
 void create_env1(t_main *main)
 {
     char **str;
+    char **tmp_env;
+    int line;
+    int i;
 
     str = ft_split(main->token->str, '=');
-    printf("%s\n", str[0]);
-    if (arg_in_env(main, str[0], 0))
-        printf("OK\n\n");
-    else
-        printf("NOT");
+    line = arg_in_env(main, str[0], 0);
+    if (line != -1)
+    {
+        main->envp[line] = (char*)malloc(sizeof(char) * (ft_strlen(main->token->str) + 1));
+        ft_strlcpy(main->envp[line], main->token->str, ft_strlen(main->token->str) + 1);
+    }
+    else if (ft_strchr(main->token->str, '='))
+    {
+        i = count_env_args(main, 0);
+        tmp_env = (char **)malloc((i + 2) * sizeof(char *));
+        tmp_env[i + 1] = NULL;
+        i = 0;
+        while (main->envp[i] != NULL)
+        {
+            tmp_env[i] = ft_strdup(main->envp[i]);
+            i++;
+        }
+        tmp_env[i] = ft_strdup(main->token->str);
+        main->envp = tmp_env;
+    }
 }
 
 void sh_export(t_main *main)

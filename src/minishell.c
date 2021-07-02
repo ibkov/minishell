@@ -73,9 +73,11 @@ int executor(__unused t_main *main, char **envp)
 	{
 		execve_builtin(main);
 	}
-	if(is_bin(main->token->str, main))
+	else if(is_bin(main->token->str, main))
 	{
 		execve_bin(main);
+		while (main->token && main->token->type != END)
+			main->token = main->token->next;
 	}
 	else if(ft_strncmp(main->token->str, "exit", 4))
 	{
@@ -120,7 +122,7 @@ int main(int argc, __unused char **argv, char **envp)
 				{
 					if (main.token && main.token->type == END)
 						main.token = main.token->next;
-					if(executor(&main, main.envp))
+					if(main.token && executor(&main, main.envp))
 						break;
 					if (main.token)
 						main.token = main.token->next;
