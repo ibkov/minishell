@@ -8,10 +8,7 @@ int arg_in_env(t_main *main, char *str, int j)
     {
         temp_str = ft_split(main->envp[j], '=');
         if (ft_strncmp(str, temp_str[0], ft_strlen(temp_str[0])) == 0)
-        {
-            free_argv(temp_str);
             return (1);
-        }
         j++;
     }
     free_argv(temp_str);

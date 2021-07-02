@@ -98,5 +98,7 @@ void	redirect(t_main *main);
 void	sig_int(int code);
 void	sig_quit(int code);
 void	sig_init(void);
+int 	executor(__unused t_main *main, char **envp);
+int 	arg_in_env(t_main *main, char *str, int j);
 
 #endif

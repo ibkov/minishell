@@ -23,24 +23,24 @@ int		is_builtin(char *command, t_main *main)
 void execve_builtin_bin(t_main *main)
 {
 	main->tokens = create_argv(main->token);
-	printf("%s\n", main->unix_path);
 	g_sig.pid = fork();
 	if(g_sig.pid == 0)
 	{
 		// redirect(main);
 		execve(main->unix_path, main->tokens, main->envp);
-		printf("zsh: command not found: |%s|\n", main->tokens[0]);
+		printf("zsh: command not found: %s\n", main->tokens[0]);
 		exit(0);
 	}
 	else if (g_sig.pid > 0)
 		waitpid(g_sig.pid, 0, 0);
 	else
 		perror("Error fork\n");
+	
 }
 
 void execve_builtin(t_main *main)
 {
-	if (ft_strncmp(main->token->str,"export", 6) == 0)
+	if (ft_strncmp(main->token->str, "export", 6) == 0)
 		sh_export(main);
 	else if (ft_strncmp(main->token->str, "unset", 5) == 0)
 		sh_unset(main);
@@ -67,7 +67,7 @@ int executor(__unused t_main *main, char **envp)
 		{
 			redirect(main);
 			execve(main->unix_path, main->tokens, envp);
-			printf("zsh: command not found: |%s|\n", main->token->str);
+			printf("zsh: command not found: %s\n", main->token->str);
 			exit(0);
 		}
 		else if (g_sig.pid > 0)
@@ -99,10 +99,15 @@ int main(int argc, __unused char **argv, char **envp)
 		{
 			if (parse(&main))
 			{
+				while (main.token)
+				{
+					if (main.token && main.token->type == END)
+						main.token = main.token->next;
 					if(executor(&main, main.envp))
-					{
 						break;
-					}
+					if (main.token)
+						main.token = main.token->next;
+				}
 				// free_argv(main.tokens);
 				// free(main.base_command);
 			}
