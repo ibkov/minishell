@@ -44,8 +44,8 @@ void execve_bin(t_main *main)
 	g_sig.pid = fork();
 	if(g_sig.pid == 0)
 	{
-		dup2(fd[1], 1);
-		close(fd[0]);
+		// dup2(fd[1], 1);
+		// close(fd[0]);
 		redirect(main);
 		execve(main->unix_path, main->tokens, main->envp);
 		printf("zsh: command not found: %s\n", main->tokens[0]);
@@ -53,10 +53,10 @@ void execve_bin(t_main *main)
 	}
 	else if (g_sig.pid > 0)
 	{
-		char buf;
-		close(fd[1]);
-		while (read(fd[0], &buf, 1) > 0)
-			write(1, &buf, 1);
+		// char buf;
+		// close(fd[1]);
+		// while (read(fd[0], &buf, 1) > 0)
+		// 	write(1, &buf, 1);
 		waitpid(g_sig.pid, 0, 0);
 	}
 	else

@@ -5,6 +5,8 @@ t_sig	g_sig;
 
 int executor(__unused t_main *main, t_token *token)
 {
+	main->token = token;
+
 	if (is_builtin(token->str))
 	{
 		execve_builtin(main);
@@ -50,7 +52,6 @@ int minishell(t_main *main)
 		token = next_cmd(main->token, SKIP);
 	}
 	return (i);
-	
 }
 
 int main(int argc, __unused char **argv, char **envp)
