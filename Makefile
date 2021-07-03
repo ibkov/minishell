@@ -27,6 +27,7 @@ SRC_LIST = minishell.c \
 			signals.c \
 			redirect.c \
 			bin.c \
+			search_utils.c \
 			built-in/unset.c \
 			built-in/cd.c \
 			built-in/export.c \
