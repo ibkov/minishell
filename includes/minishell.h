@@ -20,6 +20,9 @@
 # define STDOUT 1
 # define STDERR 2
 
+# define NOSKIP 0
+# define SKIP 1
+
 enum types
 {
     EMPTY,
@@ -83,6 +86,11 @@ char 	**create_argv(t_token *token);
 int		search_binary(char *command, char **envp, t_main *main);
 char 	*get_envi_val(char **envp, char *var);
 
+int		is_builtin(char *command);
+void execve_builtin(t_main *main);
+void execve_bin(t_main *main);
+int		is_bin(char *command, t_main *main);
+
 void    sh_export(t_main *main);
 void 	sh_unset(t_main *main);
 void 	sh_env(t_main *main);
@@ -98,7 +106,6 @@ void	redirect(t_main *main);
 void	sig_int(int code);
 void	sig_quit(int code);
 void	sig_init(void);
-int 	executor(__unused t_main *main, char **envp);
 int 	arg_in_env(t_main *main, char *str, int j);
 int 	count_env_args(t_main *main, int i);
 

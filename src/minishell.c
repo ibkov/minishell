@@ -3,103 +3,54 @@
 
 t_sig	g_sig;
 
-int		is_builtin(char *command)
+int executor(__unused t_main *main, t_token *token)
 {
-	if (ft_strcmp(command, "cd") == 0)
-		return (1);
-	if (ft_strcmp(command, "env") == 0)
-		return (1);
-	if (ft_strcmp(command, "export") == 0)
-		return (1);
-	if (ft_strcmp(command, "unset") == 0)
-		return (1);
-	return (0);
-}
-
-void execve_builtin(t_main *main)
-{
-	if (ft_strncmp(main->token->str,"export", 6) == 0)
-		sh_export(main);
-	else if (ft_strncmp(main->token->str, "unset", 5) == 0)
-		sh_unset(main);
-	else if (ft_strncmp(main->token->str,"env", 3) == 0)
-		sh_env(main);
-	else if (ft_strncmp(main->token->str,"cd", 2) == 0)
-		cd(main);
-	else if (ft_strncmp(main->token->str,"pwd", 3) == 0)
-		sh_pwd(main);
-}
-
-int		is_bin(char *command, t_main *main)
-{
-	if (search_binary(command, main->envp, main))
-		return (1);
-	return (0);
-}
-
-void execve_bin(t_main *main)
-{
-	int fd[2];
-
-	pipe(fd);
-
-	main->tokens = create_argv(main->token);
-	g_sig.pid = fork();
-	if(g_sig.pid == 0)
-	{
-		dup2(fd[1], 1);
-		close(fd[0]);
-		redirect(main);
-		execve(main->unix_path, main->tokens, main->envp);
-		printf("zsh: command not found: %s\n", main->tokens[0]);
-		exit(0);
-	}
-	else if (g_sig.pid > 0)
-	{
-		char buf;
-		close(fd[1]);
-		while (read(fd[0], &buf, 1) > 0)
-			write(1, &buf, 1);
-		waitpid(g_sig.pid, 0, 0);
-	}
-	else
-		perror("Error fork\n");
-	
-}
-
-int executor(__unused t_main *main, char **envp)
-{
-	if (is_builtin(main->token->str))
+	if (is_builtin(token->str))
 	{
 		execve_builtin(main);
 	}
-	else if(is_bin(main->token->str, main))
+	else if(is_bin(token->str, main))
 	{
 		execve_bin(main);
-		while (main->token && main->token->type != END)
-			main->token = main->token->next;
+		while (token && token->type != END)
+			token = token->next;
 	}
-	else if(ft_strncmp(main->token->str, "exit", 4))
-	{
-		g_sig.pid = fork();
-		if(g_sig.pid == 0)
-		{
-			redirect(main);
-			execve(main->unix_path, main->tokens, envp);
-			printf("zsh: command not found: %s\n", main->token->str);
-			exit(0);
-		}
-		else if (g_sig.pid > 0)
-			waitpid(g_sig.pid, 0, 0);
-		else
-			perror("Error fork\n");
-	}
-	else
+	else if(ft_strncmp(token->str, "exit", 4) == 0)
 	{
 		sh_exit(main);
 		return (1);
 	}
 	return (0);
+}
+
+t_token	*next_cmd(t_token *token, int skip)
+{
+	if (token && skip)
+		token = token->next;
+	while (token && token->type != CMD)
+	{
+		token = token->next;
+		if (token && token->type == CMD && token->prev == NULL)
+			;
+		else if (token && token->type == CMD && token->prev->type < END)
+			token = token->next;
+	}
+	return (token);
+}
+
+int minishell(t_main *main)
+{
+	t_token *token;
+	int i;
+
+	token = next_cmd(main->token, NOSKIP);
+	while (main->exit == 0 && token)
+	{
+		i = executor(main, token);
+		token = next_cmd(main->token, SKIP);
+	}
+	return (i);
+	
 }
 
 int main(int argc, __unused char **argv, char **envp)
@@ -122,7 +73,7 @@ int main(int argc, __unused char **argv, char **envp)
 				{
 					if (main.token && main.token->type == END)
 						main.token = main.token->next;
-					if(main.token && executor(&main, main.envp))
+					if(main.token && minishell(&main))
 						break;
 					if (main.token)
 						main.token = main.token->next;
