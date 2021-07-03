@@ -1,18 +1,21 @@
 #include "minishell.h"
 
-void sh_pwd(t_main *main)
+int		sh_pwd(void)
 {
-	main->tokens = create_argv(main->token);
-    g_sig.pid = fork();
-	if(g_sig.pid == 0)
+	char	*cwd;
+
+	cwd = (char *)malloc(sizeof(char) * 1024);
+	if (!cwd)
+		return (0);
+	if (getcwd(cwd, 1024))
 	{
-		redirect(main);
-		execve(main->unix_path, main->tokens, main->envp);
-		printf("zsh: command not found: |%s|\n", main->tokens[0]);
-		exit(0);
+		printf("%s\n", cwd);
+		free(cwd);
+		return (1);
 	}
-	else if (g_sig.pid > 0)
-		waitpid(g_sig.pid, 0, 0);
 	else
-		perror("Error fork\n");
+	{
+		free(cwd);
+		return (0);
+	}
 }

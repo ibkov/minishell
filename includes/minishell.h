@@ -86,7 +86,7 @@ char 	*get_envi_val(char **envp, char *var);
 void    sh_export(t_main *main);
 void 	sh_unset(t_main *main);
 void 	sh_env(t_main *main);
-void 	sh_pwd(t_main *main);
+int 	sh_pwd(void);
 int 	sh_exit(t_main *main);
 void    cd(t_main *main);
 void 	echo(t_main *main);
@@ -101,6 +101,7 @@ void	sig_init(void);
 int 	executor(__unused t_main *main, char **envp);
 int 	arg_in_env(t_main *main, char *str, int j);
 int 	count_env_args(t_main *main, int i);
+int 	sh_echo(t_main *main);
 
 int str_error(char *str, int ret);
 #endif

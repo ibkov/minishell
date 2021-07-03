@@ -13,6 +13,12 @@ int		is_builtin(char *command)
 		return (1);
 	if (ft_strcmp(command, "unset") == 0)
 		return (1);
+	if (ft_strcmp(command, "echo") == 0)
+		return (1);
+	if (ft_strcmp(command, "pwd") == 0)
+		return (1);
+	if (ft_strcmp(command, "exit") == 0)
+		return (1);
 	return (0);
 }
 
@@ -27,7 +33,11 @@ void execve_builtin(t_main *main)
 	else if (ft_strncmp(main->token->str,"cd", 2) == 0)
 		cd(main);
 	else if (ft_strncmp(main->token->str,"pwd", 3) == 0)
-		sh_pwd(main);
+		sh_pwd();
+	else if (ft_strncmp(main->token->str, "echo", 4) == 0)
+		sh_echo(main);
+	else if (ft_strncmp(main->token->str, "exit", 4) == 0)
+		sh_exit(main);
 }
 
 int		is_bin(char *command, t_main *main)
@@ -133,5 +143,5 @@ int main(int argc, __unused char **argv, char **envp)
 		}
 	}
 	free_argv(main.envp);
-	return (0);
+	return (main.exit);
 }

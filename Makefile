@@ -32,6 +32,8 @@ SRC_LIST = minishell.c \
 			built-in/export.c \
 			built-in/pwd.c \
 			built-in/exit.c \
+			built-in/echo.c \
+			built-in/env.c \
 
 
 SRC = $(addprefix $(SRC_DIR), $(SRC_LIST))
