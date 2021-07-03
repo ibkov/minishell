@@ -14,8 +14,8 @@ int executor(__unused t_main *main, t_token *token)
 	else if(is_bin(token->str, main))
 	{
 		execve_bin(main);
-		while (token && token->type != END)
-			token = token->next;
+		// while (token && token->type != END)
+		// 	token = token->next;
 	}
 	else if(ft_strncmp(token->str, "exit", 4) == 0)
 	{

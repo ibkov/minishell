@@ -22,6 +22,8 @@ int		is_builtin(char *command)
 
 void execve_builtin(t_main *main)
 {
+	main->tokens = create_argv(main->token);
+	
 	if (ft_strncmp(main->token->str,"export", 6) == 0)
 		sh_export(main);
 	else if (ft_strncmp(main->token->str, "unset", 5) == 0)
