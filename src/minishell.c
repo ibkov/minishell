@@ -69,7 +69,7 @@ int executor(__unused t_main *main, t_token *token)
 						close(fd[0]);
 						dup2(fd[1], 1);
 						close(fd[1]);
-						redirect(main);
+						// redirect(main);
 						execve(main->unix_path, main->tokens, main->envp);
 						printf("zsh: command not found: %s\n", main->tokens[0]);
 						exit(1);
@@ -95,10 +95,11 @@ int executor(__unused t_main *main, t_token *token)
 						close(fd[1]);
 						dup2(fd[0], 0);
 						close(fd[0]);
-						redirect(main);
+						// redirect(main);
+						printf("%s %s\n", main->unix_path, main->tokens[0]);
 						execve(main->unix_path, main->tokens, main->envp);
 						printf("zsh: command not found: %s\n", main->tokens[0]);
-						exit(0);
+						exit(1);
 					}
 					else if (g_sig.pid > 0)
 					{
@@ -111,32 +112,32 @@ int executor(__unused t_main *main, t_token *token)
 					else
 						perror("Error fork\n");
 				}
-				else
-				{
-					main->tokens = create_argv(token);
-					g_sig.pid = fork();
-					if(g_sig.pid == 0)
-					{
-						dup2(fd[0], 0);
-						dup2(fd[1], 1);
-						close(fd[1]);
-						close(fd[0]);
-						redirect(main);
-						execve(main->unix_path, main->tokens, main->envp);
-						printf("zsh: command not found: %s\n", main->tokens[0]);
-						exit(0);
-					}
-					else if (g_sig.pid > 0)
-					{
-						waitpid(g_sig.pid, 0, 0);
-						while (token && token->type != PIPE)
-						{
-							token = token->next;
-						}
-					}
-					else
-						perror("Error fork\n");
-				}
+				// else
+				// {
+				// 	main->tokens = create_argv(token);
+				// 	g_sig.pid = fork();
+				// 	if(g_sig.pid == 0)
+				// 	{
+				// 		dup2(fd[0], 0);
+				// 		dup2(fd[1], 1);
+				// 		close(fd[1]);
+				// 		close(fd[0]);
+				// 		redirect(main);
+				// 		execve(main->unix_path, main->tokens, main->envp);
+				// 		printf("zsh: command not found: %s\n", main->tokens[0]);
+				// 		exit(0);
+				// 	}
+				// 	else if (g_sig.pid > 0)
+				// 	{
+				// 		waitpid(g_sig.pid, 0, 0);
+				// 		while (token && token->type != PIPE)
+				// 		{
+				// 			token = token->next;
+				// 		}
+				// 	}
+				// 	else
+				// 		perror("Error fork\n");
+				// }
 			}
 		}
 	}
@@ -210,6 +211,7 @@ int main(int argc, __unused char **argv, char **envp)
 				{
 					if (main.token && main.token->type == END)
 						main.token = main.token->next;
+					printf("Go\n");
 					if(main.token && minishell(&main))
 						break;
 					while(main.token && main.token->type != END)
