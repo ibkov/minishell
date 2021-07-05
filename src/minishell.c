@@ -60,6 +60,7 @@ int executor(__unused t_main *main, t_token *token)
 	// int fd1[2];
 	// int pids[PROCESS_NUM];
 	// int pipes[PROCESS_NUM + 1][2];
+	//рефакторинг
 	
 	main->token = token;
 	if ((i = is_pipe(token)) > 0)
