@@ -41,4 +41,5 @@ int main(void)
     close(fd[0]);
     close(fd[1]);
     wait(NULL);
+    wait(NULL);
 }

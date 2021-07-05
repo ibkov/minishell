@@ -47,118 +47,135 @@ int middle_pipe(t_token *token)
 	return (0);
 }
 
+#define PROCESS_NUM 3
 
 int executor(__unused t_main *main, t_token *token)
 {
 	int fd[2];
+	int fd1[2];
+	// int pids[PROCESS_NUM];
+	// int pipes[PROCESS_NUM - 1][2];
 
-	main->token = token;
+	// for(int i = 0; i < PROCESS_NUM - 1; i++)
+	// 	pipe(pipes[i]);
+	
+	// main->token = token;
+	// if (is_pipe(main->token))
+	// {
+	// 	for(int i = 0; i < PROCESS_NUM; i++)
+	// 	{
+	// 		pids[i] = fork();
+	// 		if (pids[i] == 0)
+	// 		{
+	// 			if (i == 0)
+	// 			{
+	// 				dup2(pipes[i][1], 1);
+	// 				for(int j = 0; j < PROCESS_NUM - 1; j++)
+	// 				{
+	// 					if (i != j) {
+	// 						close(pipes[j][0]);
+	// 					}
+    //            			if (i + 1 != j) {
+	// 						close(pipes[j][1]);
+	// 					}
+	// 				}
+	// 			}
+				
+	// 		}
+			
+	// 	}
+	// }
 	if (is_pipe(main->token))
 	{
 		pipe(fd);
+		pipe(fd1);
 		while (token && token->type != END)
 		{
 			if(is_bin(token->str, main))
 			{
 				if (first_pipe(token))
 				{
-					main->tokens = create_argv(main->token);
-					g_sig.pid = fork();
-					if(g_sig.pid == 0)
+					main->tokens = create_argv(token);
+					if(fork() == 0)
 					{
-						close(fd[0]);
 						dup2(fd[1], 1);
+						close(fd[0]);
+						close(fd1[0]);
+						close(fd1[1]);
 						close(fd[1]);
-						// redirect(main);
+						redirect(main);
 						execve(main->unix_path, main->tokens, main->envp);
 						printf("zsh: command not found: %s\n", main->tokens[0]);
 						exit(1);
 					}
-					else if (g_sig.pid > 0)
+					else 
 					{
-						waitpid(g_sig.pid, 0, 0);
 						while (token && token->type != PIPE)
 						{
 							token = token->next;
 						}
 						token = token->next;
 					}
-					else
-						perror("Error fork\n");
 				}
-				else if(last_pipe(token))
+				else if(middle_pipe(token))
 				{
 					main->tokens = create_argv(token);
-					g_sig.pid = fork();
-					if(g_sig.pid == 0)
+					if(fork() == 0)
 					{
-						close(fd[1]);
 						dup2(fd[0], 0);
+						dup2(fd1[1], 1);
+						close(fd1[0]);
+						close(fd[1]);
 						close(fd[0]);
-						// redirect(main);
-						printf("%s %s\n", main->unix_path, main->tokens[0]);
+						close(fd1[1]);
+						redirect(main);
 						execve(main->unix_path, main->tokens, main->envp);
 						printf("zsh: command not found: %s\n", main->tokens[0]);
 						exit(1);
 					}
-					else if (g_sig.pid > 0)
+					else
 					{
-						waitpid(g_sig.pid, 0, 0);
+						while (token && token->type != PIPE)
+						{
+							token = token->next;
+						}
+						token = token->next;
+					}
+
+				}
+				else if(last_pipe(token))
+				{
+					main->tokens = create_argv(token);
+					if(fork() == 0)
+					{
+						dup2(fd1[0], 0);
+						close(fd1[1]);
+						close(fd[1]);
+						close(fd[0]);
+						close(fd1[0]);
+						redirect(main);
+						execve(main->unix_path, main->tokens, main->envp);
+						printf("zsh: command not found: %s\n", main->tokens[0]);
+						exit(1);
+					}
+					else
+					{
 						while (token && token->type != PIPE)
 						{
 							token = token->next;
 						}
 					}
-					else
-						perror("Error fork\n");
 				}
-				// else
-				// {
-				// 	main->tokens = create_argv(token);
-				// 	g_sig.pid = fork();
-				// 	if(g_sig.pid == 0)
-				// 	{
-				// 		dup2(fd[0], 0);
-				// 		dup2(fd[1], 1);
-				// 		close(fd[1]);
-				// 		close(fd[0]);
-				// 		redirect(main);
-				// 		execve(main->unix_path, main->tokens, main->envp);
-				// 		printf("zsh: command not found: %s\n", main->tokens[0]);
-				// 		exit(0);
-				// 	}
-				// 	else if (g_sig.pid > 0)
-				// 	{
-				// 		waitpid(g_sig.pid, 0, 0);
-				// 		while (token && token->type != PIPE)
-				// 		{
-				// 			token = token->next;
-				// 		}
-				// 	}
-				// 	else
-				// 		perror("Error fork\n");
-				// }
 			}
 		}
 	}
-	
-	// if (is_builtin(token->str))
-	// {
-	// 	execve_builtin(main);
-	// }
-	// else if(is_bin(token->str, main))
-	// {
-	// 	execve_bin(main);
-	// 	// while (token && token->type != END)
-	// 	// 	token = token->next;
-	// }
-	// else if(ft_strncmp(token->str, "exit", 4) == 0)
-	// {
-	// 	sh_exit(main);
-	// 	return (1);
-	// }
 	close(fd[0]);
 	close(fd[1]);
+	close(fd1[0]);
+	close(fd1[1]);
+	wait(NULL);
+	wait(NULL);
+	wait(NULL);
 	return (0);
 }
 
