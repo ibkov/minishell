@@ -10,7 +10,9 @@ int main(void)
 {
     int fd[2];
     pipe(fd);
-    if(fork() == 0)
+    int pid;
+    int pid1;
+    if((pid = fork()) == 0)
     {
         close(fd[0]);
         dup2(fd[1], 1);
@@ -18,7 +20,11 @@ int main(void)
         execlp("ls", "ls", NULL);
         exit(1);
     }
-    if(fork() == 0)
+    // else
+    //     wait(NULL);
+    //     waitpid(pid, 0, 0);
+    
+    if((pid1 = fork()) == 0)
     {
         // dup2(fd[0], 0);
         // dup2(fd[1], 1);
@@ -30,6 +36,9 @@ int main(void)
         execlp("cat", "cat","-e" ,NULL);
         exit(1);
     }
+    // else
+    //     wait(0);
+    //     waitpid(pid1, 0, 0);
     // if(fork() == 0)
     // {
     //     close(fd[1]);
@@ -40,6 +49,8 @@ int main(void)
     // }
     close(fd[0]);
     close(fd[1]);
-    wait(NULL);
-    wait(NULL);
+    waitpid(pid1, 0, 0);
+    waitpid(pid, 0, 0);
+    // wait(NULL);
+    // wait(NULL);
 }
