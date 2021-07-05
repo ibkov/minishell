@@ -19,9 +19,34 @@ int is_pipe(t_token *token)
 	return (i);
 }
 
+int **init_pipes(int proc_num)
+{
+	int i;
+	int **pipes;
+
+	i = 0;
+	if(!(pipes = (int **)malloc(sizeof(int *) * (proc_num + 1))))
+		return (NULL);
+	pipes[proc_num] = NULL;
+	while(pipes[i])
+	{
+		if(!(pipes[i] = (int *)malloc(sizeof(int) * 2)))
+			return (NULL);
+		i++;
+	}
+	i = 0;
+	while(i < proc_num - 1)
+	{
+		pipe(pipes[i]);
+		i++;
+	}
+	return (pipes);
+}
+
 int executor(__unused t_main *main, t_token *token)
 {
 	int proc_num;
+	int **pipes;
 	int i;
 	
 	i = is_pipe(token);
@@ -31,9 +56,8 @@ int executor(__unused t_main *main, t_token *token)
 	main->token = token;
 	if (i > 0)
 	{
-		int pipes[i][2];
-		for(int i = 0; i < proc_num - 1; i++)
-			pipe(pipes[i]);
+		if(!(pipes = init_pipes(proc_num)))
+			return (1);
 		for(int i = 0; i < proc_num; i++)
 		{
 			if(is_bin(token->str, main))

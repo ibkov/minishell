@@ -6,7 +6,7 @@ void	redirect(t_main *main)
 	t_token *token;
 
 	token = main->token;
-	while (token->type != TRUNC && token->type != APPEND && token->next && token->type != INPUT)
+	while (token->type != TRUNC && token->type != APPEND && token && token->type != INPUT)
 	{
 		token = token->next;
 	}

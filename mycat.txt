@@ -1,0 +1,32 @@
+Makefile
+README.md
+a.out
+cat.txt
+gnl
+includes
+libft
+libft.a
+minishell
+minishell.dSYM
+mycat.txt
+parser
+src
+super.txt
+text.txt
+Makefile
+README.md
+a.out
+cat.txt
+gnl
+includes
+libft
+libft.a
+minishell
+minishell.dSYM
+mycat.txt
+parser
+src
+super.txt
+text.txt
+       0       0       0
+       0       0       0
