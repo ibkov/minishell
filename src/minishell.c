@@ -51,132 +51,154 @@ int middle_pipe(t_token *token)
 
 int executor(__unused t_main *main, t_token *token)
 {
-	int fd[2];
-	int fd1[2];
-	// int pids[PROCESS_NUM];
-	// int pipes[PROCESS_NUM - 1][2];
+	// int fd[2];
+	// int fd1[2];
+	int pids[PROCESS_NUM];
+	int pipes[PROCESS_NUM + 1][2];
 
-	// for(int i = 0; i < PROCESS_NUM - 1; i++)
-	// 	pipe(pipes[i]);
+	for(int i = 0; i < PROCESS_NUM + 1; i++)
+		pipe(pipes[i]);
 	
-	// main->token = token;
-	// if (is_pipe(main->token))
-	// {
-	// 	for(int i = 0; i < PROCESS_NUM; i++)
-	// 	{
-	// 		pids[i] = fork();
-	// 		if (pids[i] == 0)
-	// 		{
-	// 			if (i == 0)
-	// 			{
-	// 				dup2(pipes[i][1], 1);
-	// 				for(int j = 0; j < PROCESS_NUM - 1; j++)
-	// 				{
-	// 					if (i != j) {
-	// 						close(pipes[j][0]);
-	// 					}
-    //            			if (i + 1 != j) {
-	// 						close(pipes[j][1]);
-	// 					}
-	// 				}
-	// 			}
-				
-	// 		}
-			
-	// 	}
-	// }
+	main->token = token;
 	if (is_pipe(main->token))
 	{
-		pipe(fd);
-		pipe(fd1);
-		while (token && token->type != END)
+		for(int i = 0; i < PROCESS_NUM; i++)
 		{
-			if(is_bin(token->str, main))
+			main->tokens = create_argv(token);
+			is_bin(token->str, main);
+			pids[i] = fork();
+			if (pids[i] == 0)
 			{
-				if (first_pipe(token))
-				{
-					main->tokens = create_argv(token);
-					if(fork() == 0)
+					for(int j = 0; j < PROCESS_NUM + 1; j++)
 					{
-						dup2(fd[1], 1);
-						close(fd[0]);
-						close(fd1[0]);
-						close(fd1[1]);
-						close(fd[1]);
-						redirect(main);
-						execve(main->unix_path, main->tokens, main->envp);
-						printf("zsh: command not found: %s\n", main->tokens[0]);
-						exit(1);
-					}
-					else 
-					{
-						while (token && token->type != PIPE)
-						{
-							token = token->next;
+						if (i != j) {
+							close(pipes[j][0]);
 						}
+               			if (i + 1 != j) {
+							close(pipes[j][1]);
+						}
+					}
+					dup2(pipes[i][0], 0);
+					dup2(pipes[i+1][1], 1);
+					close(pipes[i][0]);
+            		close(pipes[i + 1][1]);
+					execve(main->unix_path, main->tokens, main->envp);
+				
+			}
+			else
+			{
+				if (i != PROCESS_NUM - 1)
+				{
+					while (token && token->type != PIPE)
+					{
 						token = token->next;
 					}
+					token = token->next;
 				}
-				else if(middle_pipe(token))
+				else
 				{
-					main->tokens = create_argv(token);
-					if(fork() == 0)
+					while (token && token->type != PIPE)
 					{
-						dup2(fd[0], 0);
-						dup2(fd1[1], 1);
-						close(fd1[0]);
-						close(fd[1]);
-						close(fd[0]);
-						close(fd1[1]);
-						redirect(main);
-						execve(main->unix_path, main->tokens, main->envp);
-						printf("zsh: command not found: %s\n", main->tokens[0]);
-						exit(1);
-					}
-					else
-					{
-						while (token && token->type != PIPE)
-						{
-							token = token->next;
-						}
 						token = token->next;
-					}
-
-				}
-				else if(last_pipe(token))
-				{
-					main->tokens = create_argv(token);
-					if(fork() == 0)
-					{
-						dup2(fd1[0], 0);
-						close(fd1[1]);
-						close(fd[1]);
-						close(fd[0]);
-						close(fd1[0]);
-						redirect(main);
-						execve(main->unix_path, main->tokens, main->envp);
-						printf("zsh: command not found: %s\n", main->tokens[0]);
-						exit(1);
-					}
-					else
-					{
-						while (token && token->type != PIPE)
-						{
-							token = token->next;
-						}
 					}
 				}
 			}
+			
 		}
 	}
-	close(fd[0]);
-	close(fd[1]);
-	close(fd1[0]);
-	close(fd1[1]);
-	wait(NULL);
-	wait(NULL);
-	wait(NULL);
 	return (0);
+	// if (is_pipe(main->token))
+	// {
+	// 	pipe(fd);
+	// 	pipe(fd1);
+	// 	while (token && token->type != END)
+	// 	{
+	// 		if(is_bin(token->str, main))
+	// 		{
+	// 			if (first_pipe(token))
+	// 			{
+	// 				main->tokens = create_argv(token);
+	// 				if(fork() == 0)
+	// 				{
+	// 					dup2(fd[1], 1);
+	// 					close(fd[0]);
+	// 					close(fd1[0]);
+	// 					close(fd1[1]);
+	// 					close(fd[1]);
+	// 					redirect(main);
+	// 					execve(main->unix_path, main->tokens, main->envp);
+	// 					printf("zsh: command not found: %s\n", main->tokens[0]);
+	// 					exit(1);
+	// 				}
+	// 				else 
+	// 				{
+	// 					while (token && token->type != PIPE)
+	// 					{
+	// 						token = token->next;
+	// 					}
+	// 					token = token->next;
+	// 				}
+	// 			}
+	// 			else if(middle_pipe(token))
+	// 			{
+	// 				main->tokens = create_argv(token);
+	// 				if(fork() == 0)
+	// 				{
+	// 					dup2(fd[0], 0);
+	// 					dup2(fd1[1], 1);
+	// 					close(fd1[0]);
+	// 					close(fd[1]);
+	// 					close(fd[0]);
+	// 					close(fd1[1]);
+	// 					redirect(main);
+	// 					execve(main->unix_path, main->tokens, main->envp);
+	// 					printf("zsh: command not found: %s\n", main->tokens[0]);
+	// 					exit(1);
+	// 				}
+	// 				else
+	// 				{
+	// 					while (token && token->type != PIPE)
+	// 					{
+	// 						token = token->next;
+	// 					}
+	// 					token = token->next;
+	// 				}
+
+	// 			}
+	// 			else if(last_pipe(token))
+	// 			{
+	// 				main->tokens = create_argv(token);
+	// 				if(fork() == 0)
+	// 				{
+	// 					dup2(fd1[0], 0);
+	// 					close(fd1[1]);
+	// 					close(fd[1]);
+	// 					close(fd[0]);
+	// 					close(fd1[0]);
+	// 					redirect(main);
+	// 					execve(main->unix_path, main->tokens, main->envp);
+	// 					printf("zsh: command not found: %s\n", main->tokens[0]);
+	// 					exit(1);
+	// 				}
+	// 				else
+	// 				{
+	// 					while (token && token->type != PIPE)
+	// 					{
+	// 						token = token->next;
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// close(fd[0]);
+	// close(fd[1]);
+	// close(fd1[0]);
+	// close(fd1[1]);
+	// wait(NULL);
+	// wait(NULL);
+	// wait(NULL);
+	// return (0);
 }
 
 t_token	*next_cmd(t_token *token, int skip)
