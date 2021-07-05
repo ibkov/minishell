@@ -56,17 +56,13 @@ int executor(__unused t_main *main, t_token *token)
 {
 	// int fd[2];
 	int i;
-	// int pids = 0;
-	// int fd1[2];
-	// int pids[PROCESS_NUM];
-	// int pipes[PROCESS_NUM + 1][2];
-	//рефакторинг
 	
 	main->token = token;
 	if ((i = is_pipe(token)) > 0)
 	{
 		int proc_num = i + 1;
 		int pipes[i][2];
+		int pids[proc_num];
 		for(int i = 0; i < proc_num - 1; i++)
 			pipe(pipes[i]);
 		for(int i = 0; i < proc_num; i++)
@@ -76,7 +72,7 @@ int executor(__unused t_main *main, t_token *token)
 				if(i == 0)
 				{
 					main->tokens = create_argv(token);
-					if(fork() == 0)
+					if((pids[i] = fork()) == 0)
 					{
 						dup2(pipes[i][1], 1);
 						for(int i = 0;i < proc_num - 1; i++)
@@ -148,10 +144,9 @@ int executor(__unused t_main *main, t_token *token)
 		}
 		for(int i = 0; i < proc_num; i++)
 		{
-			wait(NULL);
+			waitpid(pids[i], 0, 0);
 		}
 	}
-	
 	return (0);
 	// if (is_pipe(main->token))
 	// {
